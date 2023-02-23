@@ -72,6 +72,14 @@ pub struct Graph {
 }
 
 
+fn check_timestamp(values: &Vec<String>) -> bool{
+    let test = values[2].replace("\"", "").parse::<usize>();
+    match test{
+        Ok(ok) => return true,
+        Err(err) => return false
+    }
+}
+
 pub(crate) fn parse_procmon(file: BufReader<&File>)  -> Graph {
  
 
@@ -86,32 +94,32 @@ pub(crate) fn parse_procmon(file: BufReader<&File>)  -> Graph {
     
     // Collecting keys from the excel file.
     for (num, line) in file.lines().enumerate() {
-        if num == 0 {
+        if num != 0 {
+
             let l = line.unwrap();
-            let v = l.split(',')
-                .map(|field| field.to_lowercase().replace(" ", "_"))
-                .collect();
-            keys = v;
-        } 
-        
-        // Parsing cell values
-        else {
-            let l = line.unwrap();
-            let values: Vec<String> = l.split(',')
+            let mut values: Vec<String> = l.split(',')
                 .map(|val| val.to_string())
                 .collect();
-            
-            for item in keys.iter() {
-                let time: String  = values[0].replace('"', "").parse().unwrap();
+
+                // We need to check if the timestamp is with a ',' if it is then we need to adapt our values...
+                if !check_timestamp(&values){
+                    values.remove(1);
+
+                }
+                //let time: String  = values[0].replace('"', "").parse().unwrap(); <- Not used yet be could be usefull in the future.
                 let process_name: String = values[1].replace('"', "").parse().unwrap();
                 let pid: usize  = values[2].replace('"', "").parse().unwrap();
-                let operation: String  = values[3].replace('"', "").parse().unwrap();
-                
+                let operation: String  = values[3].replace('"', "").parse().unwrap();    
                 let path: String  = values[4].replace('"', "").parse().unwrap();
-                let result: String  = values[5].replace('"', "").parse().unwrap();
-               
-                // We add the process to the list if not present
+                //let result: String  = values[5].replace('"', "").parse().unwrap(); <- Not used yet be could be usefull in the future.
+                procmon_item.name = process_name.clone();
+                procmon_item.linked_pid = pid;
+                procmon_item.operation = operation.clone();
+                procmon_item.path = path.clone();
+                procmon_item.detail = "".to_string();
+
                 match &operation as &str {
+                    
                     "Process Start" => {
                         // String = values[7].replace('"', "").parse().unwrap();
                         if !processes.contains(pid){
@@ -125,28 +133,74 @@ pub(crate) fn parse_procmon(file: BufReader<&File>)  -> Graph {
                     
                     "Process Create" => {        
                         if !nodes.contains(pid, &path, &operation){
-                            procmon_item.name = process_name.clone();
-                            procmon_item.linked_pid = pid;
-                            procmon_item.operation = operation;
-                            procmon_item.path = path;
                             procmon_item.detail = values[6].replace('"', "").replace("PID: ","").parse().unwrap();
                             nodes.nodes.push(procmon_item.clone());
                         }
                     },
 
                     "QueryEAFile" => {        
+                        if !nodes.contains(pid, &path, &operation){                          
+                            nodes.nodes.push(procmon_item.clone());
+                        }
+                    },
+
+                    "ReadFile" => {        
                         if !nodes.contains(pid, &path, &operation){
-                            procmon_item.name = process_name.clone();
-                            procmon_item.linked_pid = pid;
-                            procmon_item.operation = operation;
-                            procmon_item.path = path;
-                            procmon_item.detail = "".to_string();
+                            nodes.nodes.push(procmon_item.clone());
+                        }
+                    },
+
+                    "WriteFile" => {        
+                        if !nodes.contains(pid, &path, &operation){
+                            nodes.nodes.push(procmon_item.clone());
+                        }
+                    },
+
+
+                    "RegCreateKey" => {        
+                        if !nodes.contains(pid, &path, &operation){
+                            nodes.nodes.push(procmon_item.clone());
+                        }
+                    },
+
+                    "RegDeleteKey" => {        
+                        if !nodes.contains(pid, &path, &operation){
+                            nodes.nodes.push(procmon_item.clone());
+                        }
+                    },
+
+                    "RegSetValue" => {        
+                        if !nodes.contains(pid, &path, &operation){
+                            nodes.nodes.push(procmon_item.clone());
+                        }
+
+                    },
+
+                    "RegDeleteValue" => {        
+                        if !nodes.contains(pid, &path, &operation){
+                            nodes.nodes.push(procmon_item.clone());
+                        }
+                    },
+
+                    "DeleteFile" => {        
+                        if !nodes.contains(pid, &path, &operation){
+                            nodes.nodes.push(procmon_item.clone());
+                        }
+                    },
+
+                    "TCP Connect" => {        
+                        if !nodes.contains(pid, &path, &operation){
+                            nodes.nodes.push(procmon_item.clone());
+                        }
+                    },
+
+                    "UDP Send" => {        
+                        if !nodes.contains(pid, &path, &operation){
                             nodes.nodes.push(procmon_item.clone());
                         }
                     },
                     _ => (),
                 }
-            }   
         }
     }
     return Graph {

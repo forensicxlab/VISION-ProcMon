@@ -55,11 +55,11 @@
     },
     "windows": [
       {
-        "fullscreen": false,
-        "height": 1080,
+        "width": 800,
+        "height": 600,
         "resizable": true,
+        "maximized": true,
         "title": "VISION - ProcMon",
-        "width": 1920,
         "visible": true
       }
     ]
