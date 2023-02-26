@@ -6,8 +6,8 @@
     "distDir": "../src/dist/"
   },
   "package": {
-    "productName": "vision-procmon",
-    "version": "0.1.0"
+    "productName": "VISION-ProcMon",
+    "version": "1.0.0"
   },
   "tauri": {
     "allowlist": {
@@ -24,9 +24,7 @@
       "icon": [
         "icons/32x32.png",
         "icons/128x128.png",
-        "icons/128x128@2x.png",
-        "icons/icon.icns",
-        "icons/icon.ico"
+        "icons/128x128@2x.png"
       ],
       "identifier": "com.forensicxlab.vision.procmon",
       "longDescription": "",

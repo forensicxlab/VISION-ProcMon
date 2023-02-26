@@ -22,11 +22,8 @@ pub async fn get_procmon(path: String) -> String {
         Ok(f) => f,
         Err(_) => return "-1".to_string()
     };
-    println!("Parsing....");
     let file: BufReader<&File> = BufReader::new(&f);
     let graph = parser::parse_procmon(file);
-
     let result = serde_json::to_string(&graph).expect("could not serialize the file");
-    println!("Done");
     return result.to_string();
 }

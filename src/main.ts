@@ -324,6 +324,6 @@ $('#load_btn').on("click", async function(){
   
 });
 
-document.addEventListener('DOMContentLoaded', async () => {
-    routine();
+document.addEventListener('DOMContentLoaded', () => {
+  routine();
 });
