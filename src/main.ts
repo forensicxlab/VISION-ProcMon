@@ -304,7 +304,7 @@ function routine(){
   $('#input_form').removeClass('d-none');
   $('#load_btn').addClass('btn-outline-secondary').removeClass('btn-outline-success').addClass('disabled');
   $('#import_section').removeClass("d-none");
-  $('#file_input').on("change", function(){ handleFileLoad(); });  
+  $('#file_input').on("keyup", function(){ handleFileLoad(); });  
 }
 
 $('#quit_btn').on("click", async function(){
