@@ -80,7 +80,7 @@ fn check_timestamp(values: &Vec<String>) -> bool{
     }
 }
 
-pub(crate) fn parse_procmon(file: BufReader<&File>)  -> Graph {
+pub(crate) fn parse_procmon(file: BufReader<&File>)  -> Result<Graph, String> {
  
 
     let mut process: Process = Process::new();    
@@ -88,14 +88,9 @@ pub(crate) fn parse_procmon(file: BufReader<&File>)  -> Graph {
 
     let mut procmon_item: ProcMon = ProcMon::new();
     let mut nodes: Nodes = Nodes { nodes: vec![]};
-
-    
-    // let keys = vec![String::from("")];
-    
     // Collecting keys from the excel file.
     for (num, line) in file.lines().enumerate() {
         if num != 0 {
-
             let l = line.unwrap();
             let mut values: Vec<String> = l.split(',')
                 .map(|val| val.to_string())
@@ -203,9 +198,9 @@ pub(crate) fn parse_procmon(file: BufReader<&File>)  -> Graph {
                 }
         }
     }
-    return Graph {
+    Ok(Graph {
         processes: processes,
         nodes: nodes,      
-    };
+    })
 }
 
