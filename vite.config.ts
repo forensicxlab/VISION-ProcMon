@@ -2,7 +2,7 @@ import { defineConfig } from 'vite'
 
 export default defineConfig({
   // prevent vite from obscuring rust errors
-  clearScreen: false,
+  clearScreen: true,
   root: './src',
   resolve: {
     alias: {

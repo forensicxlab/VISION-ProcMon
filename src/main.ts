@@ -21,11 +21,11 @@ function print_error_message(message: string){
   toast.show();
 }
 
-function print_info_message(message: string){
-  $('#info-message').text(message);  
-  const toast = new bootstrap.Toast('#info-toast'); 
-  toast.show();
-}  
+// function print_info_message(message: string){
+//   $('#info-message').text(message);  
+//   const toast = new bootstrap.Toast('#info-toast'); 
+//   toast.show();
+// }  
 
 function generate_select(processes: any){
   let sorted = processes.sort((a: any, b: any) => (a.pid < b.pid) ? 1 : -1);
@@ -219,7 +219,7 @@ function display_graph(json_graph: any){
     graph.setNodeAttribute(node, "y", 100 * Math.sin(angle));
   });
  
-    const renderer = new Sigma(graph, container, {
+  new Sigma(graph, container, {
       // We don't have to declare edgeProgramClasses here, because we only use the default ones ("line" and "arrow")
       nodeProgramClasses: {
         image: getNodeProgramImage(),

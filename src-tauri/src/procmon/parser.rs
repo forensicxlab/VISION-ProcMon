@@ -75,8 +75,8 @@ pub struct Graph {
 fn check_timestamp(values: &Vec<String>) -> bool{
     let test = values[2].replace("\"", "").parse::<usize>();
     match test{
-        Ok(ok) => return true,
-        Err(err) => return false
+        Ok(_) => return true,
+        Err(_) => return false
     }
 }
 
@@ -90,7 +90,7 @@ pub(crate) fn parse_procmon(file: BufReader<&File>)  -> Graph {
     let mut nodes: Nodes = Nodes { nodes: vec![]};
 
     
-    let mut keys = vec![String::from("")];
+    // let keys = vec![String::from("")];
     
     // Collecting keys from the excel file.
     for (num, line) in file.lines().enumerate() {

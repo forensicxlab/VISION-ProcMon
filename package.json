@@ -1,7 +1,7 @@
 {
   "name": "vision-procmon",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -26,7 +26,10 @@
     "vite": "^4.1.0"
   },
   "dependencies": {
-    "@popperjs/core": "^2.11.6",
-    "jquery": "^3.6.3"
+    "bootstrap": "^5.2.3",
+    "graphology": "^0.25.1",
+    "graphology-layout-force": "^0.2.4",
+    "jquery": "^3.6.3",
+    "sigma": "^2.4.0"
   }
 }
