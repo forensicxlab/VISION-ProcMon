@@ -80,7 +80,7 @@ fn check_timestamp(values: &Vec<String>) -> bool{
     }
 }
 
-pub(crate) fn parse_procmon(file: BufReader<&File>)  -> Result<Graph, String> {
+pub(crate) fn parse_procmon(file: BufReader<&File>)  -> Graph {
  
 
     let mut process: Process = Process::new();    
@@ -198,9 +198,9 @@ pub(crate) fn parse_procmon(file: BufReader<&File>)  -> Result<Graph, String> {
                 }
         }
     }
-    Ok(Graph {
+    Graph {
         processes: processes,
         nodes: nodes,      
-    })
+    }
 }
 
