@@ -10,7 +10,8 @@ VISION-ProcMon is a tool dedicated for malware analysis and specifically when pe
 To better understand the capabilities of this tool, you may check this blog article demonstrating the behavioral analysis of a malware using VISION-ProcMon : https://www.forensicxlab.com/posts/vision-procmon/
 
 # Install
-VISION-ProcMon is cross platform, the release contains all the bundles. However if you seek to check the code first and build the app yourself here are the instructions to follow:
+VISION-ProcMon is using tauri therefore is cross platform, the release contains all the bundles you need. 
+However, if you seek to check the code first and build the app yourself here are the instructions to follow:
 
 ```
 git clone https://github.com/forensicxlab/VISION-ProcMon.git
