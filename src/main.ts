@@ -96,11 +96,20 @@ function display_graph(json_graph: any){
       if (!graph.nodes().includes("Files")){
         graph.addNode("Files", {label: "Files", size: 10, color: "#FFFFFF"});
         graph.addEdge(selected_item, "Files", {type: "arrow", label: "Interacts with", size: 3, color: "#000000"});
-      }    
-      if (!graph.nodes().includes(item.path)){
-        graph.addNode(item.path, {label: item.path, size: 10, color: "#FFFFFF"});
-        graph.addEdge("Files", item.path, {type: "arrow", label: item.operation + "(" + steps_count + ")", size: 3, color: "#e91e63"});
       }
+
+      if (!graph.nodes().includes("QueryEA")){
+        graph.addNode("QueryEA", {label: "QueryEA", size: 10, color: "#FFFFFF"});
+        graph.addEdge("Files", "QueryEA", {type: "arrow", label: "", size: 3, color: "#000000"});
+      }    
+
+     if (!graph.nodes().includes(item.path)){
+        graph.addNode(item.path, {label: item.path, size: 10, color: "#FFFFFF"});
+      }
+      else{
+        graph.addEdge("QueryEA", item.path, {type: "arrow", label: item.operation + "(" + steps_count + ")", size: 3, color: "#e91e63"});
+      }
+      
       //console.log(item.detail); // TODO => Use this when the user clicks (Popover ??)
       steps_count++; 
     }
@@ -111,10 +120,20 @@ function display_graph(json_graph: any){
         graph.addNode("Files", {label: "Files", size: 10, color: "#FFFFFF"});
         graph.addEdge(selected_item, "Files", {type: "arrow", label: "Interacts with", size: 3, color: "#000000"});
       }    
+
+      if (!graph.nodes().includes("Read")){
+        graph.addNode("Read", {label: "Read", size: 10, color: "#FFFFFF"});
+        graph.addEdge("Files", "Read", {type: "arrow", label: "", size: 3, color: "#000000"});
+      }    
+
       if (!graph.nodes().includes(item.path)){
         graph.addNode(item.path, {label: item.path, size: 10, color: "#FFFFFF"});
-        graph.addEdge("Files", item.path, {type: "arrow", label: item.operation + "(" + steps_count + ")", size: 3, color: "#2a5d75"});
       }
+      else{
+        graph.addEdge("Read", item.path, {type: "arrow", label: item.operation + "(" + steps_count + ")", size: 3, color: "#2a5d75"});
+      }
+      
+
       //console.log(item.detail); // TODO => Use this when the user clicks (Popover ??)
       steps_count++; 
     }
@@ -124,10 +143,21 @@ function display_graph(json_graph: any){
         graph.addNode("Files", {label: "Files", size: 10, color: "#FFFFFF"});
         graph.addEdge(selected_item, "Files", {type: "arrow", label: "Interacts with", size: 3, color: "#000000"});
       }    
+
+
+      if (!graph.nodes().includes("Write")){
+        graph.addNode("Write", {label: "Write", size: 10, color: "#FFFFFF"});
+        graph.addEdge("Files", "Write", {type: "arrow", label: "", size: 3, color: "#000000"});
+      }    
+
+
       if (!graph.nodes().includes(item.path)){
         graph.addNode(item.path, {label: item.path, size: 10, color: "#FFFFFF"});
-        graph.addEdge("Files", item.path, {type: "arrow", label: item.operation + "(" + steps_count + ")", size: 3, color: "#9c27b0"});
       }
+      else{
+        graph.addEdge("Write", item.path, {type: "arrow", label: item.operation + "(" + steps_count + ")", size: 3, color: "#9c27b0"});
+      }
+      
       //console.log(item.detail); // TODO => Use this when the user clicks (Popover ??)
       steps_count++; 
     }
@@ -137,11 +167,20 @@ function display_graph(json_graph: any){
       if (!graph.nodes().includes("Registry")){
         graph.addNode("Registry", {label: "Registry Hive", size: 10, color: "#FFFFFF"});
         graph.addEdge(selected_item, "Registry", {type: "arrow", label: "Interacts with", size: 3, color: "#000000"});
-      }     
+      }
+
+      if (!graph.nodes().includes("Key Creation")){
+        graph.addNode("Key Creation", {label: "Key Creation", size: 10, color: "#FFFFFF"});
+        graph.addEdge("Registry", "Key Creation", {type: "arrow", label: "", size: 3, color: "#000000"});
+      }
+      
       if (!graph.nodes().includes(item.path)){
         graph.addNode(item.path, {label: item.path, size: 10, color: "#FFFFFF"});
-        graph.addEdge("Registry", item.path, {type: "arrow", label: item.operation + "(" + steps_count + ")", size: 3, color: "#e91e63"});
       } 
+      else{
+        graph.addEdge("Key Creation", item.path, {type: "arrow", label: item.operation + "(" + steps_count + ")", size: 3, color: "#e91e63"});
+      }
+      
       steps_count++; 
 
     }
@@ -151,13 +190,22 @@ function display_graph(json_graph: any){
       if (!graph.nodes().includes("Registry")){
         graph.addNode("Registry", {label: "Registry Hive", size: 10, color: "#FFFFFF"});
         graph.addEdge(selected_item, "Registry", {type: "arrow", label: "Interacts with", size: 3, color: "#000000"});
-      }     
+      }
+
+      if (!graph.nodes().includes("Delete Value")){
+        graph.addNode("Delete Value", {label: "Delete Value", size: 10, color: "#FFFFFF"});
+        graph.addEdge("Registry", "Delete Value", {type: "arrow", label: "", size: 3, color: "#000000"});
+      }
+
       if (!graph.nodes().includes(item.path)){
         graph.addNode(item.path, {label: item.path, size: 10, color: "#FFFFFF"});
-        graph.addEdge("Registry", item.path, {type: "arrow", label: item.operation+ "(" + steps_count + ")", size: 3, color: "#0c797d"});
-      } 
+        graph.addEdge("Delete Value", item.path, {type: "arrow", label: item.operation+ "(" + steps_count + ")", size: 3, color: "#0c797d"});
+      }
+      else{
+        graph.addEdge("Delete Value", item.path, {type: "arrow", label: item.operation+ "(" + steps_count + ")", size: 3, color: "#0c797d"});
+      }
+      
       steps_count++; 
-
     }
 
     
@@ -166,10 +214,19 @@ function display_graph(json_graph: any){
         graph.addNode("Registry", {label: "Registry Hive", size: 10, color: "#FFFFFF"});
         graph.addEdge(selected_item, "Registry", {type: "arrow", label: "Interacts with", size: 3, color: "#000000"});
       }     
+
+      if (!graph.nodes().includes("Set Value")){
+        graph.addNode("Set Value", {label: "Set Value", size: 10, color: "#FFFFFF"});
+        graph.addEdge("Registry", "Set Value", {type: "arrow", label: "", size: 3, color: "#000000"});
+      }
+
       if (!graph.nodes().includes(item.path)){
         graph.addNode(item.path, {label: item.path, size: 10, color: "#FFFFFF"});
-        graph.addEdge("Registry", item.path, {type: "arrow", label: item.operation + "(" + steps_count + ")", size: 3, color: "#d5572f"});
       } 
+      else{
+        graph.addEdge("Set Value", item.path, {type: "arrow", label: item.operation + "(" + steps_count + ")", size: 3, color: "#d5572f"});
+      }
+      
       steps_count++; 
     }
 
@@ -200,6 +257,8 @@ function display_graph(json_graph: any){
         graph.addNode("Network", {label: "Network", size: 10, color: "#FFFFFF"});
         graph.addEdge(selected_item, "Network", {type: "arrow", label: "Interacts with", size: 3, color: "#000000"});
       }     
+
+
       if (!graph.nodes().includes(src)){
         graph.addNode(src, {label: src, size: 10, color: "#FFFFFF"});
         graph.addEdge("Network", src, {type: "arrow", label: item.operation + "(" + steps_count + ")", size: 3, color: "#00796b"});
