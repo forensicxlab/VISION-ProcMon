@@ -105,6 +105,7 @@ function display_graph(json_graph: any){
 
      if (!graph.nodes().includes(item.path)){
         graph.addNode(item.path, {label: item.path, size: 10, color: "#FFFFFF"});
+        graph.addEdge("QueryEA", item.path, {type: "arrow", label: item.operation + "(" + steps_count + ")", size: 3, color: "#e91e63"});
       }
       else{
         graph.addEdge("QueryEA", item.path, {type: "arrow", label: item.operation + "(" + steps_count + ")", size: 3, color: "#e91e63"});
@@ -128,6 +129,8 @@ function display_graph(json_graph: any){
 
       if (!graph.nodes().includes(item.path)){
         graph.addNode(item.path, {label: item.path, size: 10, color: "#FFFFFF"});
+        graph.addEdge("Read", item.path, {type: "arrow", label: item.operation + "(" + steps_count + ")", size: 3, color: "#2a5d75"});
+
       }
       else{
         graph.addEdge("Read", item.path, {type: "arrow", label: item.operation + "(" + steps_count + ")", size: 3, color: "#2a5d75"});
@@ -153,6 +156,7 @@ function display_graph(json_graph: any){
 
       if (!graph.nodes().includes(item.path)){
         graph.addNode(item.path, {label: item.path, size: 10, color: "#FFFFFF"});
+        graph.addEdge("Write", item.path, {type: "arrow", label: item.operation + "(" + steps_count + ")", size: 3, color: "#9c27b0"});
       }
       else{
         graph.addEdge("Write", item.path, {type: "arrow", label: item.operation + "(" + steps_count + ")", size: 3, color: "#9c27b0"});
@@ -176,6 +180,7 @@ function display_graph(json_graph: any){
       
       if (!graph.nodes().includes(item.path)){
         graph.addNode(item.path, {label: item.path, size: 10, color: "#FFFFFF"});
+        graph.addEdge("Key Creation", item.path, {type: "arrow", label: item.operation + "(" + steps_count + ")", size: 3, color: "#e91e63"});
       } 
       else{
         graph.addEdge("Key Creation", item.path, {type: "arrow", label: item.operation + "(" + steps_count + ")", size: 3, color: "#e91e63"});
@@ -222,6 +227,7 @@ function display_graph(json_graph: any){
 
       if (!graph.nodes().includes(item.path)){
         graph.addNode(item.path, {label: item.path, size: 10, color: "#FFFFFF"});
+        graph.addEdge("Set Value", item.path, {type: "arrow", label: item.operation + "(" + steps_count + ")", size: 3, color: "#d5572f"});
       } 
       else{
         graph.addEdge("Set Value", item.path, {type: "arrow", label: item.operation + "(" + steps_count + ")", size: 3, color: "#d5572f"});
