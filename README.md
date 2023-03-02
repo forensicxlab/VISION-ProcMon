@@ -1,5 +1,5 @@
 <p align="center">
-<img src="https://github.com/forensicxlab/VISION-ProcMon/blob/main/src/assets/vision_readme.svg"  width="200" height="250" alt="VISION-ProcMon"/>
+<img src="https://github.com/forensicxlab/VISION-ProcMon/blob/main/src/assets/vision_readme.svg"  width="200" height="290" alt="VISION-ProcMon"/>
 </p>
 
 # About
@@ -9,7 +9,7 @@ VISION-ProcMon is a tool dedicated for malware analysis and specifically when pe
 ## Use case
 
 <p align="center">
-<img src="https://github.com/forensicxlab/forensicxlab.github.io/blob/main/images/vision_procmon/10.png"  width="900" height="600" alt="VISION-ProcMon"/>
+<img src="https://github.com/forensicxlab/forensicxlab.github.io/blob/main/images/vision_procmon/10.png"  width="900" height="500" alt="VISION-ProcMon"/>
 </p>
 To better understand the capabilities of this tool, you may check this blog article demonstrating the behavioral analysis of a malware using VISION-ProcMon : https://www.forensicxlab.com/posts/vision-procmon/
 
