@@ -1,5 +1,5 @@
 <p align="center">
-<img src="https://github.com/forensicxlab/VISION-ProcMon/blob/main/src/assets/vision_readme.svg"  width="200" height="280" alt="VISION-ProcMon"/>
+<img src="https://github.com/forensicxlab/VISION-ProcMon/blob/main/src/assets/vision_readme.svg"  width="200" height="250" alt="VISION-ProcMon"/>
 </p>
 
 # About
