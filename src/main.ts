@@ -49,6 +49,7 @@ function display_graph(json_graph: any){
   $('#process_filter').append($('.input_select'));
   $('.container-fluid').remove();
   $('#quit').fadeIn();
+  $('#dashboard').fadeIn();
   const container = document.getElementById("sigma-container") as HTMLElement;
   $('#sigma-container').empty();
   const graph = new Graph();
@@ -327,8 +328,8 @@ function display_graph(json_graph: any){
 async function load(path: string){
   $('#title').fadeOut();
   $('#logo').animate({
-    width: 200,
-    height: 150,
+    width: 250,
+    height: 200,
  });
 
   $('#loading_scan').removeClass('d-none');
@@ -381,6 +382,7 @@ async function load(path: string){
 
 function routine(){
   $('#sigma-container').empty();
+  $('#dashboard').hide();
   $('#quit').hide();
   $('#process_filter').hide(); 
   $('#registry_actions').hide(); 

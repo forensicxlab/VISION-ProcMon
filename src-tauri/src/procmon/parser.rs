@@ -100,8 +100,7 @@ pub(crate) fn parse_procmon(file: BufReader<&File>)  -> Graph {
                 if !check_timestamp(&values){
                     values= l.splitn(8,',')
                         .map(|val| val.to_string().replace('"', ""))
-                        .collect();
-                    
+                        .collect();         
                     values.remove(1);
                 }
                 //let time: String  = values[0].replace('"', "").parse().unwrap(); <- Not used yet be could be usefull in the future.
@@ -159,7 +158,6 @@ pub(crate) fn parse_procmon(file: BufReader<&File>)  -> Graph {
 
                     "RegCreateKey" => {        
                         if !nodes.contains(pid, &path, &operation){
-                            println!("{:?}", values);
                             procmon_item.detail = values[6].parse().unwrap();
                             nodes.nodes.push(procmon_item.clone());
                         }
