@@ -93,20 +93,23 @@ pub(crate) fn parse_procmon(file: BufReader<&File>)  -> Graph {
         if num != 0 {
             let l = line.unwrap();
             let mut values: Vec<String> = l.splitn(7,',')
-                .map(|val| val.to_string())
+                .map(|val| val.to_string().replace('"', ""))
                 .collect();
 
                 // We need to check if the timestamp is with a ',' if it is then we need to adapt our values...
                 if !check_timestamp(&values){
+                    values= l.splitn(8,',')
+                        .map(|val| val.to_string().replace('"', ""))
+                        .collect();
+                    
                     values.remove(1);
-
                 }
                 //let time: String  = values[0].replace('"', "").parse().unwrap(); <- Not used yet be could be usefull in the future.
-                let process_name: String = values[1].replace('"', "").parse().unwrap();
-                let pid: usize  = values[2].replace('"', "").parse().unwrap();
-                let operation: String  = values[3].replace('"', "").parse().unwrap();    
-                let path: String  = values[4].replace('"', "").parse().unwrap();
-                //let result: String  = values[5].replace('"', "").parse().unwrap(); <- Not used yet be could be usefull in the future.
+                let process_name: String = values[1].parse().unwrap();
+                let pid: usize  = values[2].parse().unwrap();
+                let operation: String  = values[3].parse().unwrap();    
+                let path: String  = values[4].parse().unwrap();
+                //let result: String  = values[5].parse().unwrap(); <- Not used yet be could be usefull in the future.
                 procmon_item.name = process_name.clone();
                 procmon_item.linked_pid = pid;
                 procmon_item.operation = operation.clone();
@@ -116,21 +119,21 @@ pub(crate) fn parse_procmon(file: BufReader<&File>)  -> Graph {
                 match &operation as &str {
                     
                     "Process Start" => {
-                        // String = values[7].replace('"', "").parse().unwrap();
+                        // String = values[7].parse().unwrap();
                         if !processes.contains(pid){
                             process.name = process_name.clone();
                             process.pid = pid;
-                            //I need to isolate the ppid from the details 
+                            //I need to isolate the ppid and the commandline from the details 
                             let details: Vec<String> = values[6].splitn(3,',').map(|val| val.to_string()).collect();
-                            process.ppid = details[0].replace('"', "").replace("Parent PID: ","").parse().unwrap();
-                            process.command_line = details[1].replace('"', "").replace("Command line: ","").parse().unwrap();
+                            process.ppid = details[0].replace("Parent PID: ","").parse().unwrap();
+                            process.command_line = details[1].replace("Command line: ","").parse().unwrap();
                             processes.processes.push(process.clone());
                         }    
                     },
                     
                     "Process Create" => {        
                         if !nodes.contains(pid, &path, &operation){
-                            procmon_item.detail = values[6].replace('"', "").parse().unwrap();
+                            procmon_item.detail = values[6].parse().unwrap();
                             nodes.nodes.push(procmon_item.clone());
                         }
                     },
@@ -156,28 +159,29 @@ pub(crate) fn parse_procmon(file: BufReader<&File>)  -> Graph {
 
                     "RegCreateKey" => {        
                         if !nodes.contains(pid, &path, &operation){
-                            procmon_item.detail = values[6].replace('"', "").parse().unwrap();
+                            println!("{:?}", values);
+                            procmon_item.detail = values[6].parse().unwrap();
                             nodes.nodes.push(procmon_item.clone());
                         }
                     },
 
                     "RegDeleteKey" => {        
                         if !nodes.contains(pid, &path, &operation){
-                            procmon_item.detail = values[6].replace('"', "").parse().unwrap();
+                            procmon_item.detail = values[6].parse().unwrap();
                             nodes.nodes.push(procmon_item.clone());
                         }
                     },
 
                     "RegSetValue" => {        
                         if !nodes.contains(pid, &path, &operation){
-                            procmon_item.detail = values[6].replace('"', "").parse().unwrap();
+                            procmon_item.detail = values[6].parse().unwrap();
                             nodes.nodes.push(procmon_item.clone());
                         }
                     },
 
                     "RegDeleteValue" => {        
                         if !nodes.contains(pid, &path, &operation){
-                            procmon_item.detail = values[6].replace('"', "").parse().unwrap();
+                            procmon_item.detail = values[6].parse().unwrap();
                             nodes.nodes.push(procmon_item.clone());
                         }
                     },
