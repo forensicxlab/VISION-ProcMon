@@ -1,8 +1,8 @@
 [package]
 name = "app"
-version = "0.1.0"
-description = "A Tauri App"
-authors = ["you"]
+version = "1.3.0"
+description = "VISION-ProcMon"
+authors = ["Félix Guyard"]
 license = ""
 repository = ""
 default-run = "app"
