@@ -84,11 +84,9 @@ function display_graph(json_graph: any){
     
     if (item.linked_pid == process.pid && item.operation == "Process Create"){
       if (!graph.nodes().includes(item.path)){
-        graph.addNode(item.path, {label: item.path, size: 10, color: "#FFFFFF"});
+        graph.addNode(item.path, {label: item.path, size: 10, color: "#FFFFFF", details: item.detail});
         graph.addEdge(process.name, item.path, {type: "arrow", label: item.operation + "(" + steps_count + ")", size: 3, color: "#752a37"});
       }
-      
-      //console.log(item.detail); // TODO => Use this when the user clicks (Popover ??)
       steps_count++; 
     }
 
@@ -111,7 +109,6 @@ function display_graph(json_graph: any){
         graph.addEdge("QueryEA", item.path, {type: "arrow", label: item.operation + "(" + steps_count + ")", size: 3, color: "#e91e63"});
       }
       
-      //console.log(item.detail); // TODO => Use this when the user clicks (Popover ??)
       steps_count++; 
     }
 
@@ -136,8 +133,6 @@ function display_graph(json_graph: any){
         graph.addEdge("Read", item.path, {type: "arrow", label: item.operation + "(" + steps_count + ")", size: 3, color: "#2a5d75"});
       }
       
-
-      //console.log(item.detail); // TODO => Use this when the user clicks (Popover ??)
       steps_count++; 
     }
 
@@ -179,7 +174,7 @@ function display_graph(json_graph: any){
       }
       
       if (!graph.nodes().includes(item.path)){
-        graph.addNode(item.path, {label: item.path, size: 10, color: "#FFFFFF"});
+        graph.addNode(item.path, {label: item.path, size: 10, color: "#FFFFFF", details: item.detail});
         graph.addEdge("Key Creation", item.path, {type: "arrow", label: item.operation + "(" + steps_count + ")", size: 3, color: "#e91e63"});
       } 
       else{
@@ -203,7 +198,7 @@ function display_graph(json_graph: any){
       }
 
       if (!graph.nodes().includes(item.path)){
-        graph.addNode(item.path, {label: item.path, size: 10, color: "#FFFFFF"});
+        graph.addNode(item.path, {label: item.path, size: 10, color: "#FFFFFF", details: item.detail});
         graph.addEdge("Delete Value", item.path, {type: "arrow", label: item.operation+ "(" + steps_count + ")", size: 3, color: "#0c797d"});
       }
       else{
@@ -226,7 +221,7 @@ function display_graph(json_graph: any){
       }
 
       if (!graph.nodes().includes(item.path)){
-        graph.addNode(item.path, {label: item.path, size: 10, color: "#FFFFFF"});
+        graph.addNode(item.path, {label: item.path, size: 10, color: "#FFFFFF", details: item.detail});
         graph.addEdge("Set Value", item.path, {type: "arrow", label: item.operation + "(" + steps_count + ")", size: 3, color: "#d5572f"});
       } 
       else{
@@ -284,7 +279,7 @@ function display_graph(json_graph: any){
     graph.setNodeAttribute(node, "y", 100 * Math.sin(angle));
   });
  
-  new Sigma(graph, container, {
+  const renderer = new Sigma(graph, container, {
       // We don't have to declare edgeProgramClasses here, because we only use the default ones ("line" and "arrow")
       nodeProgramClasses: {
         image: getNodeProgramImage(),
@@ -296,11 +291,38 @@ function display_graph(json_graph: any){
       allowInvalidContainer: true,
     });
 
+    
+    renderer.on("downNode", (e) => {
+      $('#details_body').empty();
+      $('#card_details').empty();
+      let attributes = graph.getNodeAttributes(e.node);
+      if (attributes.details != undefined){
+        const details = attributes.details.split(",");
+        $.each(details, function(_index, item){
+          const detail = document.createElement('span');
+          detail.setAttribute('id','highlight-me');
+          const br = document.createElement('br');
+          detail.textContent = item as string;
+          $("#details_body").append(detail);
+          $("#details_body").append(br);
+        });
+        $('#details_info').show();
+      }
+      else{
+        $('#details_info').show();
+        $('#card_details').text("No details available.");
+      }
+
+    });
+    
+
     // //Create the spring layout and start it
     const layout = new ForceSupervisor(graph);
-//    const layout = new NoverlapLayout(graph);
+    //const layout = new NoverlapLayout(graph);
     layout.start();
 }
+
+
 
 async function load(path: string){
   $('#title').fadeOut();
@@ -364,6 +386,7 @@ function routine(){
   $('#registry_actions').hide(); 
   $('#title-2').hide(); 
   $('#process_info').hide();
+  $('#details_info').hide();
   $('#process_picker').hide();
   $('#loading_scan').addClass('d-none');
   $('#input_form').removeClass('d-none');

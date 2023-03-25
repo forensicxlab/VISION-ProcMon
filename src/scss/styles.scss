@@ -525,35 +525,25 @@
     overflow: hidden;
   }
 
-#process_info {
+#main-menu{
     position: absolute;
-    font-size: 12px;
-    width: 30rem;
     right: 1em;
-    top: 1em;
-}
-
-
-#process_filter {
-    position: absolute;
-    font-size: 12px;
-    width: 30rem;
-    left: 1em;
     bottom: 1em;
 }
 
-#quit {
-  position: absolute;
-  font-size: 12px;
-  right: 1em;
-  bottom: 1em;
-}
-
-#registry_actions {
-    position: absolute;
+#registry_actions, #process_info, #details_info, #main-menu {
     font-size: 12px;
-    width: 40rem;
-    left: 1em;
-    top: 1em;
 }
 
+#highlight-me {
+  animation: glow 700ms 1;
+  border-radius: 3px;
+  padding: 2px 5px;
+}
+
+@keyframes glow {
+  50% {
+    background: rgba(255, 255, 255, 0.5);
+    box-shadow: 0 0 10px rgb(255, 255, 255);
+  }
+}
