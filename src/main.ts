@@ -7,13 +7,12 @@ import Sigma from "sigma";
 import getNodeProgramImage from "sigma/rendering/webgl/programs/node.image";
 import ForceSupervisor from "graphology-layout-force/worker";
 import drawHover from 'sigma/rendering/canvas/hover';
-
+import { once } from '@tauri-apps/api/event'
 
 
 function handleFileLoad() {
   $('#load_btn').removeClass('btn-outline-secondary').addClass('btn-outline-success').removeClass('disabled');
 }
-
 
 function print_error_message(message: string){
   $('#error-message').text(message);  
@@ -380,7 +379,37 @@ async function load(path: string){
   );
 }
 
+function listen_drag(){
+  once('tauri://file-drop-hover', event => {
+    $("#import_section").addClass("overlay");
+    $("#drag-and-drop-message").addClass("text-white");
+    let payload = event.payload
+    $("#drag-and-drop-message").text("Perform analysis for " + payload);
+  })
+
+  once('tauri://file-drop-cancelled', event => {
+    $("#drag-and-drop-message").removeClass("text-white");
+    $("#drag-and-drop-message").text("Drag and Drop your CSV here");
+    $("#import_section").removeClass("overlay");
+    listen_drag(); 
+  })
+}
+
 function routine(){
+    once('tauri://file-drop', async event => {
+    let path = event.payload as string;
+    await invoke('check_procmon', {path: path[0]}).then(() => {
+        $("#import_section").removeClass("overlay");
+        load(path[0]);
+    })
+    .catch((error) => {
+      print_error_message("Error : "+ error);
+    }
+    );
+  })
+
+  listen_drag();
+
   $('#sigma-container').empty();
   $('#dashboard').hide();
   $('#quit').hide();
@@ -400,18 +429,6 @@ function routine(){
 $('#quit_btn').on("click", async function(){
   location.reload();
   routine();
-});
-
-$('#load_btn').on("click", async function(){
-  let path = $("#file_input").val() as string;
-  await invoke('check_procmon', {path: path}).then(() => {
-      load(path); 
-  })
-  .catch((error) => {
-    print_error_message("Error : "+ error);
-  }
-  );
-  
 });
 
 document.addEventListener('DOMContentLoaded', () => {
