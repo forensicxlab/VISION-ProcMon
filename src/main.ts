@@ -387,7 +387,7 @@ function listen_drag(){
     $("#drag-and-drop-message").text("Perform analysis for " + payload);
   })
 
-  once('tauri://file-drop-cancelled', event => {
+  once('tauri://file-drop-cancelled', () => {
     $("#drag-and-drop-message").removeClass("text-white");
     $("#drag-and-drop-message").text("Drag and Drop your CSV here");
     $("#import_section").removeClass("overlay");
