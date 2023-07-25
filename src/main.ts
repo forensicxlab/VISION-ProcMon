@@ -9,11 +9,6 @@ import ForceSupervisor from "graphology-layout-force/worker";
 import drawHover from 'sigma/rendering/canvas/hover';
 import { once } from '@tauri-apps/api/event'
 
-
-function handleFileLoad() {
-  $('#load_btn').removeClass('btn-outline-secondary').addClass('btn-outline-success').removeClass('disabled');
-}
-
 function print_error_message(message: string){
   $('#error-message').text(message);  
   const toast = new bootstrap.Toast('#error-toast'); 
@@ -39,6 +34,11 @@ function generate_select(processes: any){
   });
 }
 
+/* display_graph:
+Take the JSON resulted from the CSV parsing from rust backend and build the graph.
+Triggered everytime the user is changing the filters.
+// TODO : Divide this function in sub-functions to only display the triggered filters and not rebuild the whole grah ?
+*/
 function display_graph(json_graph: any){
   const values = $('#process_select').val() as string;
   const array = values.split(" ");
@@ -81,7 +81,7 @@ function display_graph(json_graph: any){
       
       steps_count++; 
     }
-    
+    // Display the Root Node Process.
     if (item.linked_pid == process.pid && item.operation == "Process Create"){
       if (!graph.nodes().includes(item.path)){
         graph.addNode(item.path, {label: item.path, size: 10, color: "#FFFFFF", details: item.detail});
@@ -90,6 +90,7 @@ function display_graph(json_graph: any){
       steps_count++; 
     }
 
+    // Create a node and and edge for each QueryEAFile item
     if (item.linked_pid == process.pid && item.operation == "QueryEAFile" && $('#File_filter').is(":checked")){
       if (!graph.nodes().includes("Files")){
         graph.addNode("Files", {label: "Files", size: 10, color: "#FFFFFF"});
@@ -112,7 +113,7 @@ function display_graph(json_graph: any){
       steps_count++; 
     }
 
-
+    // Create a node and and edge for each file readed
     if (item.linked_pid == process.pid && item.operation == "ReadFile" && $('#File_filter').is(":checked") ){
       if (!graph.nodes().includes("Files")){
         graph.addNode("Files", {label: "Files", size: 10, color: "#FFFFFF"});
@@ -136,6 +137,7 @@ function display_graph(json_graph: any){
       steps_count++; 
     }
 
+    // Create a node and and edge for each file written
     if (item.linked_pid == process.pid && item.operation == "WriteFile" && $('#File_filter').is(":checked") ){
       if (!graph.nodes().includes("Files")){
         graph.addNode("Files", {label: "Files", size: 10, color: "#FFFFFF"});
@@ -155,13 +157,11 @@ function display_graph(json_graph: any){
       }
       else{
         graph.addEdge("Write", item.path, {type: "arrow", label: item.operation + "(" + steps_count + ")", size: 3, color: "#9c27b0"});
-      }
-      
-      //console.log(item.detail); // TODO => Use this when the user clicks (Popover ??)
+      }      
       steps_count++; 
     }
     
-    
+    // Create a node and and edge for the created registry key
     if (item.linked_pid == linked_pid && item.operation == "RegCreateKey" && $('#RegCreateKey_filter').is(":checked")){
       if (!graph.nodes().includes("Registry")){
         graph.addNode("Registry", {label: "Registry Hive", size: 10, color: "#FFFFFF"});
@@ -185,7 +185,7 @@ function display_graph(json_graph: any){
 
     }
 
-    
+    // Create a node and and edge for the deleted registry key value
     if (item.linked_pid == linked_pid && item.operation == "RegDeleteValue" && $('#RegDeleteValue_filter').is(":checked")){
       if (!graph.nodes().includes("Registry")){
         graph.addNode("Registry", {label: "Registry Hive", size: 10, color: "#FFFFFF"});
@@ -208,7 +208,7 @@ function display_graph(json_graph: any){
       steps_count++; 
     }
 
-    
+    // Create a node and and edge for the set registry key value
     if (item.linked_pid == linked_pid && item.operation == "RegSetValue" && $('#RegSetValue_filter').is(":checked")){
       if (!graph.nodes().includes("Registry")){
         graph.addNode("Registry", {label: "Registry Hive", size: 10, color: "#FFFFFF"});
@@ -230,7 +230,7 @@ function display_graph(json_graph: any){
       
       steps_count++; 
     }
-
+    // Create a node and and edge for the TCP connection
     if (item.linked_pid == linked_pid && item.operation == "TCP Connect" && $('#Network_filter').is(":checked")){
       let src_dst = item.path.split('->');
       let src = src_dst[0].split(':')[0];
@@ -249,7 +249,7 @@ function display_graph(json_graph: any){
       }
       steps_count++; 
     }
-
+    // Create a node and and edge for the UDP send item
     if (item.linked_pid == linked_pid && item.operation == "UDP Send" && $('#Network_filter').is(":checked")){
       let src_dst = item.path.split('->');
       let src = src_dst[0].split(':')[0];
@@ -316,14 +316,16 @@ function display_graph(json_graph: any){
     });
     
 
-    // //Create the spring layout and start it
+    // Create the spring layout and start it
     const layout = new ForceSupervisor(graph);
-    //const layout = new NoverlapLayout(graph);
     layout.start();
 }
 
 
-
+/* load : 
+Take the dragged and dropped CSV file, send it to rust backend and wait for the result. 
+Update the UI in the same time.
+*/
 async function load(path: string){
   $('#title').fadeOut();
   $('#logo').animate({
@@ -395,6 +397,11 @@ function listen_drag(){
   })
 }
 
+/*
+routine: 
+Display the main menu where the user can drag and drop the CSV.
+Triggered at first launch of the application or when the user click the "Quit" button.
+*/
 function routine(){
     once('tauri://file-drop', async event => {
     let path = event.payload as string;
@@ -423,7 +430,6 @@ function routine(){
   $('#input_form').removeClass('d-none');
   $('#load_btn').addClass('btn-outline-secondary').removeClass('btn-outline-success').addClass('disabled');
   $('#import_section').removeClass("d-none");
-  $('#file_input').on("keyup", function(){ handleFileLoad(); });  
 }
 
 $('#quit_btn').on("click", async function(){
