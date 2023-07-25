@@ -1,4 +1,4 @@
-name: 'publish'
+name: 'VISION-ProcMon-Publish'
 on:
   push:
     branches:
