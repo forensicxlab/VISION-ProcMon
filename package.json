@@ -29,6 +29,7 @@
     "bootstrap": "^5.2.3",
     "graphology": "^0.25.1",
     "graphology-layout-force": "^0.2.4",
+    "graphology-layout-forceatlas2": "^0.10.1",
     "jquery": "^3.6.3",
     "sigma": "^2.4.0"
   }

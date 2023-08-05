@@ -5,7 +5,7 @@ import './scss/styles.scss';
 import Graph from "graphology";
 import Sigma from "sigma";
 import getNodeProgramImage from "sigma/rendering/webgl/programs/node.image";
-import ForceSupervisor from "graphology-layout-force/worker";
+import FA2Layout from 'graphology-layout-forceatlas2/worker';
 import drawHover from 'sigma/rendering/canvas/hover';
 import { once } from '@tauri-apps/api/event'
 
@@ -69,7 +69,7 @@ function display_graph(json_graph: any){
   $('#card_process_ppid').text("PPID: " + process.ppid);
   $('#card_process_cmdline').text("Command Line : " + process.command_line);
   
-  $('#process_info').fadeIn();
+  $('#process_info_card').fadeIn();
   let steps_count = 0;
   $.each(json_graph.nodes.nodes, function(_index, item){
     // Look for the parent process
@@ -185,6 +185,31 @@ function display_graph(json_graph: any){
 
     }
 
+        // Create a node and and edge for the deleted registry key
+        if (item.linked_pid == linked_pid && item.operation == "RegDeleteKey" && $('#RegDeleteKey_filter').is(":checked")){
+          if (!graph.nodes().includes("Registry")){
+            graph.addNode("Registry", {label: "Registry Hive", size: 10, color: "#FFFFFF"});
+            graph.addEdge(selected_item, "Registry", {type: "arrow", label: "Interacts with", size: 3, color: "#000000"});
+          }
+    
+          if (!graph.nodes().includes("Key Deletion")){
+            graph.addNode("Key Deletion", {label: "Key Deletion", size: 10, color: "#FFFFFF"});
+            graph.addEdge("Registry", "Key Deletion", {type: "arrow", label: "", size: 3, color: "#000000"});
+          }
+          
+          if (!graph.nodes().includes(item.path)){
+            graph.addNode(item.path, {label: item.path, size: 10, color: "#FFFFFF", details: item.detail});
+            graph.addEdge("Key Deletion", item.path, {type: "arrow", label: item.operation + "(" + steps_count + ")", size: 3, color: "#e91e63"});
+          } 
+          else{
+            graph.addEdge("Key Deletion", item.path, {type: "arrow", label: item.operation + "(" + steps_count + ")", size: 3, color: "#e91e63"});
+          }
+          
+          steps_count++; 
+    
+        }
+    
+
     // Create a node and and edge for the deleted registry key value
     if (item.linked_pid == linked_pid && item.operation == "RegDeleteValue" && $('#RegDeleteValue_filter').is(":checked")){
       if (!graph.nodes().includes("Registry")){
@@ -288,7 +313,7 @@ function display_graph(json_graph: any){
       renderEdgeLabels: true,
       labelSize: 12,
       labelRenderer: drawHover,
-      allowInvalidContainer: true,
+      allowInvalidContainer: false,
     });
 
     
@@ -296,7 +321,20 @@ function display_graph(json_graph: any){
       $('#details_body').empty();
       $('#card_details').empty();
       let attributes = graph.getNodeAttributes(e.node);
-      if (attributes.details != undefined){
+
+      if(attributes.label == "Write" || attributes.label == "Read" || attributes.label == "QueryEA" || attributes.label ==  "Key Creation" || attributes.label ==  "Delete Value" || attributes.label == "Set Value" || attributes.label ==  "Key Deletion"){
+        for (const {attributes} of graph.neighborEntries(e.node)) {
+          console.log(attributes);
+          const detail = document.createElement('span');
+          detail.setAttribute('id','highlight-me');
+          const br = document.createElement('br');
+          detail.textContent = attributes.label as string;
+          $("#details_body").append(detail);
+          $("#details_body").append(br);
+        }
+      }
+
+      else if (attributes.details != undefined){
         const details = attributes.details.split(",");
         $.each(details, function(_index, item){
           const detail = document.createElement('span');
@@ -306,21 +344,29 @@ function display_graph(json_graph: any){
           $("#details_body").append(detail);
           $("#details_body").append(br);
         });
-        $('#details_info').show();
       }
       else{
-        $('#details_info').show();
-        $('#card_details').text("No details available.");
+        $('#details_body').text(attributes.label);
       }
+
+      $('#details_info').show();
 
     });
     
 
     // Create the spring layout and start it
-    const layout = new ForceSupervisor(graph);
+    const layout = new FA2Layout(graph,
+      {
+        settings: {
+          gravity: 0.0001,
+        }
+      }      
+    );
+    setTimeout(function(){
+      layout.stop();
+    }, 5000);
     layout.start();
 }
-
 
 /* load : 
 Take the dragged and dropped CSV file, send it to rust backend and wait for the result. 
@@ -346,7 +392,7 @@ async function load(path: string){
     $('#generate_btn').on("click", function(){
       display_graph(json_graph);
       $('#process_filter').fadeIn();
-      $('#registry_actions').fadeIn();
+      $('#filter_card').fadeIn();
     });
 
     $('#RegCreateKey_filter').on("change", function(){
@@ -421,9 +467,9 @@ function routine(){
   $('#dashboard').hide();
   $('#quit').hide();
   $('#process_filter').hide(); 
-  $('#registry_actions').hide(); 
+  $('#filter_card').hide(); 
   $('#title-2').hide(); 
-  $('#process_info').hide();
+  $('#process_info_card').hide();
   $('#details_info').hide();
   $('#process_picker').hide();
   $('#loading_scan').addClass('d-none');
@@ -439,4 +485,60 @@ $('#quit_btn').on("click", async function(){
 
 document.addEventListener('DOMContentLoaded', () => {
   routine();
+});
+
+
+
+// Make the DIV element draggable:
+dragElement(document.getElementById("process_info_card"));
+dragElement(document.getElementById("filter_card"));
+dragElement(document.getElementById("details_info"));
+
+
+function dragElement(elmnt: HTMLElement | null) {
+  var pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+  if(elmnt){
+    var header = document.getElementById(elmnt.id + "_header")
+    if(header) {
+      header.onmousedown = dragMouseDown;
+    } else {
+        elmnt.onmousedown = dragMouseDown;
+    }
+  }
+  function dragMouseDown(e: any) {
+    e = e || window.event;
+    e.preventDefault();
+    // get the mouse cursor position at startup:
+    pos3 = e.clientX;
+    pos4 = e.clientY;
+    document.onmouseup = closeDragElement;
+    // call a function whenever the cursor moves:
+    document.onmousemove = elementDrag;
+  }
+
+  function elementDrag(e: any) {
+    e = e || window.event;
+    e.preventDefault();
+    // calculate the new cursor position:
+    pos1 = pos3 - e.clientX;
+    pos2 = pos4 - e.clientY;
+    pos3 = e.clientX;
+    pos4 = e.clientY;
+    // set the element's new position:
+    if(elmnt){
+      elmnt.style.top = (elmnt.offsetTop - pos2) + "px";
+      elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
+    }
+  }
+
+  function closeDragElement() {
+    // stop moving when mouse button is released:
+    document.onmouseup = null;
+    document.onmousemove = null;
+  }
+}
+
+
+$('#closebtn').on("click", async function(){
+  $('#details_info').hide();
 });

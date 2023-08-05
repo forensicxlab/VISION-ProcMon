@@ -49,108 +49,93 @@
             <button class="btn btn-outline-success" type="button" id="generate_btn">Apply</button>
           </div>
         </div>
-        
        </div>
       </div>
     </div>
   </div>
-
-  <div id="dashboard" class="row h-100" style="overflow-y: scroll;">
-    <div class="col-2 bg-dark">
-      <div class="row" >
-        <div class="col-12">
-          <div class="d-flex justify-content-center align-items-center">
-            <img id="logo" src="/assets/vision_procmon.svg" style="width: 50%;">
-          </div>
-        </div>
-        <div class="col-12">
-          <div id="process_info">
-            <div class="card border-warning text-bg-dark">
-              <div class="card-header border-warning">
-                Current process information.
-              </div>
-              <div class="card-body">
-                <span id="card_process_name"></span>
-                  <br>
-                  <span id="card_process_pid"></span>
-                  <br>
-                  <span id="card_process_cmdline" class="text-break"></span>
-                <br>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="col-12">
-          <div id="registry_actions" class="mt-2">
-            <div class="card border-warning text-bg-dark">
-              <div class="card-header border-warning">
-                Filter
-              </div>
-              <div class="card-body">
-                <div class="row g-3 align-items-center">
-                    <div class="col-auto">
-                      <div class="form-check form-switch">
-                        <input class="form-check-input" type="checkbox" role="switch" id="RegCreateKey_filter">
-                        <label class="form-check-label">Registry key creation</label>
-                      </div>
-                    </div>
-                    <div class="col-auto">
-                      <div class="form-check form-switch">
-                        <input class="form-check-input" type="checkbox" role="switch" id="RegDeleteKey_filter">
-                        <label class="form-check-label">Registry key deletion</label>
-                      </div>
-                    </div>
-                    <div class="col-auto">
-                      <div class="form-check form-switch">
-                        <input class="form-check-input" type="checkbox"  role="switch" id="RegSetValue_filter">
-                        <label class="form-check-label" checked>Registry set values</label>
-                      </div>
-                    </div>
-                    <div class="col-auto">
-                      <div class="form-check form-switch">
-                        <input class="form-check-input" type="checkbox"  role="switch" id="RegDeleteValue_filter">
-                        <label class="form-check-label" checked>Registry delete values</label>
-                      </div>
-                    </div>
-                    <div class="col-auto">
-                      <div class="form-check form-switch">
-                        <input class="form-check-input" type="checkbox"  role="switch" id="File_filter">
-                        <label class="form-check-label" checked>File operations</label>
-                      </div>
-                    </div>
-                    <div class="col-auto">
-                      <div class="form-check form-switch">
-                        <input class="form-check-input" type="checkbox"  role="switch" id="Network_filter">
-                        <label class="form-check-label" checked>Network operations</label>
-                      </div>
-                    </div>
-                  </div>  
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="col-12">
-          <hr class="bg-warning border-2 border-top border-warning">
-        </div>
-        <div class="col-12">
-          <div id="details_info">
-            <div class="card border-warning text-bg-dark">
-              <div class="card-header border-warning">
-                Details
-              </div>
-              <span id="card_details" class="text-break"></span>
-              <div class="card-body" id="details_body">
-              </div>
-            </div>
-          </div>          
-        </div>
+  
+  
+  
+  <div class="card border-dark text-bg-dark" id="process_info_card">
+    <div class="card-header border-white" id="process_info_card_header">
+          Current process information.
+    </div>
+    <div class="card-body">
+      <div class="row">
+        <span id="card_process_name"></span>
+        <br>
+        <span id="card_process_pid"></span>
+        <br>
+        <span id="card_process_cmdline" class="text-break"></span>
+        <br>
       </div>
-   </div>
-    <div class="col-10">
-      <div id="sigma-container"></div>
     </div>
   </div>
 
+  <div class="card border-dark text-bg-dark" id="filter_card">
+    <div class="card-header border-white" id="filter_card_header">
+          Filters
+    </div>
+    <div class="card-body">
+      <div class="row g-3 align-items-center">
+          <div class="col-auto">
+            <div class="form-check form-switch">
+              <input class="form-check-input" type="checkbox" role="switch" id="RegCreateKey_filter">
+              <label class="form-check-label">Registry key creation</label>
+            </div>
+          </div>
+          <div class="col-auto">
+            <div class="form-check form-switch">
+              <input class="form-check-input" type="checkbox" role="switch" id="RegDeleteKey_filter">
+              <label class="form-check-label">Registry key deletion</label>
+            </div>
+          </div>
+          <div class="col-auto">
+            <div class="form-check form-switch">
+              <input class="form-check-input" type="checkbox"  role="switch" id="RegSetValue_filter">
+              <label class="form-check-label" checked>Registry set values</label>
+            </div>
+          </div>
+          <div class="col-auto">
+            <div class="form-check form-switch">
+              <input class="form-check-input" type="checkbox"  role="switch" id="RegDeleteValue_filter">
+              <label class="form-check-label" checked>Registry delete values</label>
+            </div>
+          </div>
+          <div class="col-auto">
+            <div class="form-check form-switch">
+              <input class="form-check-input" type="checkbox"  role="switch" id="File_filter">
+              <label class="form-check-label" checked>File operations</label>
+            </div>
+          </div>
+          <div class="col-auto">
+            <div class="form-check form-switch">
+              <input class="form-check-input" type="checkbox"  role="switch" id="Network_filter">
+              <label class="form-check-label" checked>Network operations</label>
+            </div>
+          </div>
+        </div>  
+    </div>
+  </div>
+
+
+  <div class="card border-dark text-bg-dark" id="details_info">
+    <div class="card-header border-white" id="details_info_header">
+      <div class="row">
+        <div class="col-11">
+          Details
+        </div>
+        <div class="col-1 justify-content-center">
+          <button type="button" class="btn-close btn-close-white" id="closebtn" aria-label="Close"></button>
+          </div>
+      </div>
+    </div>
+    <div class="card-body" id="details_body">
+      <span id="card_details" class="text-break"></span>
+    </div>
+  </div>
+
+  <div id="sigma-container"></div>
 
   <div id="main-menu" class="d-flex">
     <div id ="process_filter">
@@ -161,9 +146,7 @@
   </div>
 
 
-
   
-
 
 
 
