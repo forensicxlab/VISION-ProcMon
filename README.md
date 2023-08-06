@@ -14,9 +14,8 @@
     <img src="https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white" />
     <img src="https://img.shields.io/badge/Rust-000000?style=for-the-badge&logo=rust&logoColor=white"/>
 </p>
-<p align="center">
     [![VISION-ProcMon-Publish](https://github.com/forensicxlab/VISION-ProcMon/actions/workflows/main.yml/badge.svg)](https://github.com/forensicxlab/VISION-ProcMon/actions/workflows/main.yml)
-</p>
+
 
 
 # About
