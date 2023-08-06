@@ -54,13 +54,12 @@
     </div>
   </div>
   
-  
-  
-  <div class="card border-dark text-bg-dark" id="process_info_card">
-    <div class="card-header border-white" id="process_info_card_header">
-          Current process information.
+  <div class="card border-dark bg-vgrey" id="process_info_card">
+    <div class="card-header" id="process_info_card_header">
+      <i class="bi bi-info-square"></i>
+      Current process information
     </div>
-    <div class="card-body">
+    <div class="card-body text-bg-dark">
       <div class="row">
         <span id="card_process_name"></span>
         <br>
@@ -72,11 +71,12 @@
     </div>
   </div>
 
-  <div class="card border-dark text-bg-dark" id="filter_card">
+  <div class="card border-dark bg-vgrey" id="filter_card">
     <div class="card-header border-white" id="filter_card_header">
-          Filters
+      <i class="bi bi-funnel"></i> 
+      Filters
     </div>
-    <div class="card-body">
+    <div class="card-body text-bg-dark">
       <div class="row g-3 align-items-center">
           <div class="col-auto">
             <div class="form-check form-switch">
@@ -114,23 +114,27 @@
               <label class="form-check-label" checked>Network operations</label>
             </div>
           </div>
-        </div>  
+        </div>
+        <hr>
+        <label for="steps_range" class="form-label">Step : <i id="step_count"></i></label>
+        <input type="range" class="form-range" min="0" step="1" id="steps_range">
     </div>
   </div>
 
 
-  <div class="card border-dark text-bg-dark" id="details_info">
-    <div class="card-header border-white" id="details_info_header">
-      <div class="row">
-        <div class="col-11">
+  <div class="card bg-vgrey" id="details_info">
+    <div class="card-header border-dark" id="details_info_header">
+      <div class="d-flex align-items-center">
+        <span>
+          <i class="bi bi-eye"></i>
           Details
-        </div>
-        <div class="col-1 justify-content-center">
+        </span>
+        <div class="d-flex ms-auto">
           <button type="button" class="btn-close btn-close-white" id="closebtn" aria-label="Close"></button>
-          </div>
+        </div>
       </div>
     </div>
-    <div class="card-body" id="details_body">
+    <div class="card-body text-bg-dark" id="details_body">
       <span id="card_details" class="text-break"></span>
     </div>
   </div>
@@ -144,9 +148,6 @@
       <button type="button" class="btn btn-outline-dark" id="quit_btn">Quit</button>
     </div>
   </div>
-
-
-  
 
 
 

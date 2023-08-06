@@ -24,6 +24,11 @@
 
 }
 
+.bg-vgrey{
+  background-color: #2d2d2dff;
+  color: #FFF;
+}
+
 #details_body{
   overflow: auto;
 }
@@ -60,6 +65,10 @@
 
 #filter_card, #process_info_card, #details_info, #main-menu {
     font-size: 12px;
+}
+
+#filter_card_header, #process_info_card_header, #details_info_header{
+  font-size: 14px;
 }
 
 #highlight-me {
