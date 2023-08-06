@@ -3,7 +3,7 @@ import "bootstrap-icons/font/bootstrap-icons.css";
 import { invoke } from "@tauri-apps/api/tauri";
 import $ from 'jquery';
 import './scss/styles.scss';
-import Graph, { UndirectedGraph } from "graphology";
+import Graph from "graphology";
 import Sigma from "sigma";
 import getNodeProgramImage from "sigma/rendering/webgl/programs/node.image";
 import FA2Layout from 'graphology-layout-forceatlas2/worker';
