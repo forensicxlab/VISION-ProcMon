@@ -3,27 +3,37 @@ import "bootstrap-icons/font/bootstrap-icons.css";
 import { invoke } from "@tauri-apps/api/tauri";
 import $ from 'jquery';
 import './scss/styles.scss';
-import Graph from "graphology";
+import Graph, { UndirectedGraph } from "graphology";
 import Sigma from "sigma";
 import getNodeProgramImage from "sigma/rendering/webgl/programs/node.image";
 import FA2Layout from 'graphology-layout-forceatlas2/worker';
 import drawHover from 'sigma/rendering/canvas/hover';
 import { once } from '@tauri-apps/api/event'
 
+
+
+
+/*
+--------------GLOB---------------
+*/
+var graph: Graph;
+var steps_count = 0;
+const container = document.getElementById("sigma-container") as HTMLElement;
+var renderer: Sigma;
+
+// Make the DIV element draggable:
+drag_cards(document.getElementById("process_info_card"));
+drag_cards(document.getElementById("filter_card"));
+drag_cards(document.getElementById("details_info"));
+
+/*
+-------------FUNCTIONS---------------
+*/
 function print_error_message(message: string){
   $('#error-message').text(message);  
   const toast = new bootstrap.Toast('#error-toast'); 
   toast.show();
 }
-
-
-
-
-// function print_info_message(message: string){
-//   $('#info-message').text(message);  
-//   const toast = new bootstrap.Toast('#info-toast'); 
-//   toast.show();
-// }  
 
 function generate_select(processes: any){
   let sorted = processes.sort((a: any, b: any) => (a.pid < b.pid) ? 1 : -1);
@@ -41,9 +51,9 @@ function generate_select(processes: any){
 /* display_graph:
 Take the JSON resulted from the CSV parsing from rust backend and build the graph.
 Triggered everytime the user is changing the filters.
-// TODO : Divide this function in sub-functions to only display the triggered filters and not rebuild the whole grah ?
 */
 function display_graph(json_graph: any){
+  
   const values = $('#process_select').val() as string;
   const array = values.split(" ");
   const selected_item = array[0];
@@ -53,10 +63,9 @@ function display_graph(json_graph: any){
   $('.container-fluid').remove();
   $('#quit').fadeIn();
   $('#dashboard').fadeIn();
-  const container = document.getElementById("sigma-container") as HTMLElement;
   $('#sigma-container').empty();
-  const graph = new Graph();
-
+  graph = new Graph();
+  steps_count = 0;
   // First, we add the central node (the filtered process) :
   let process: any;
   $.each(json_graph.processes.processes, function(_index, item){
@@ -64,10 +73,8 @@ function display_graph(json_graph: any){
       process = item;
     }
   })
-
-  let steps_count = 0;
   // Add the node and fill the process information on the card.
-  graph.addNode(process.name, {type: "image", label: process.name, size: 10, color: "#FFFFFF", step: steps_count});
+  graph.addNode(process.name, {label: process.name, size: 10, color: "#FFFFFF", step: steps_count});
 
   $('#card_process_name').text("Process Name: " + process.name);
   $('#card_process_pid').text("PID: " + process.pid);
@@ -88,6 +95,9 @@ function display_graph(json_graph: any){
     if (item.linked_pid == process.pid && item.operation == "Process Create"){
       if (!graph.nodes().includes(item.path)){
         graph.addNode(item.path, {label: item.path, size: 10, color: "#FFFFFF", details: item.detail, step: steps_count});
+        graph.addEdge(process.name, item.path, {type: "arrow", label: item.operation + "(" + steps_count + ")", size: 3, color: "#752a37"});
+      }
+      else{
         graph.addEdge(process.name, item.path, {type: "arrow", label: item.operation + "(" + steps_count + ")", size: 3, color: "#752a37"});
       }
       steps_count++; 
@@ -299,97 +309,108 @@ function display_graph(json_graph: any){
 
   });
   steps_count--;
-  $("#steps_range").attr("max", steps_count);
-  $("#steps_range").val(steps_count);
-  $("#step_count").text(steps_count);
-
-
   graph.nodes().forEach((node, i) => {
     const angle = (i * 2 * Math.PI) / graph.order;
     graph.setNodeAttribute(node, "x", 100 * Math.cos(angle));
     graph.setNodeAttribute(node, "y", 100 * Math.sin(angle));
   });
+  render_graph(graph);
+  return graph;
+}
 
- 
-  const renderer = new Sigma(graph, container, {
-      // We don't have to declare edgeProgramClasses here, because we only use the default ones ("line" and "arrow")
-      nodeProgramClasses: {
-        image: getNodeProgramImage(),
-        
-      },
-      renderEdgeLabels: true,
-      labelSize: 12,
-      labelRenderer: drawHover,
-      labelRenderedSizeThreshold: 1,
-    });
+/* render_graph:
+Take the JSON resulted from the CSV parsing from rust backend and build the graph.
+Triggered everytime the user is changing the filters.
+*/
+function render_graph(graph: Graph){
+  // Kill the current canvases to avoid to many WebGL contexts
+  if(renderer)
+    renderer.kill() 
 
+  renderer = new Sigma(graph, container, {
+    nodeProgramClasses: {
+      image: getNodeProgramImage(),          
+    },
+    renderEdgeLabels: true,
+    labelSize: 12,
+    labelRenderer: drawHover,
+    labelRenderedSizeThreshold: 1,
+  });
+  $('#process_filter').fadeIn();
+  $('#filter_card').fadeIn();
+  renderer.on("enterNode", (_e) => {
+    document.body.style.cursor = 'pointer';
+  });
 
+  renderer.on("leaveNode", (_e) => {
+    document.body.style.cursor = 'default';
+  });
 
-    // Create the spring layout and start it
-    const layout = new FA2Layout(graph,{ settings: { gravity: 0.0001,}});
-    layout.start();
-    setTimeout(function(){
-      layout.stop();
-    }, 5000);
+  renderer.on("downNode", (e) => {
+    $('#details_body').empty();
+    $('#card_details').empty();
+    let attributes = graph.getNodeAttributes(e.node);
 
-    renderer.on("enterNode", (_e) => {
-      document.body.style.cursor = 'pointer';
-    });
-
-    renderer.on("leaveNode", (_e) => {
-      document.body.style.cursor = 'default';
-    });
-
-
-    renderer.on("downNode", (e) => {
-      $('#details_body').empty();
-      $('#card_details').empty();
-      let attributes = graph.getNodeAttributes(e.node);
-
-      if(attributes.label == "Write" || attributes.label == "Read" || attributes.label == "QueryEA" || attributes.label ==  "Key Creation" || attributes.label ==  "Delete Value" || attributes.label == "Set Value" || attributes.label ==  "Key Deletion"){
-        for (const {attributes} of graph.neighborEntries(e.node)) {
-          const detail = document.createElement('span');
-          detail.setAttribute('id','highlight-me');
-          const br = document.createElement('br');
-          detail.textContent = attributes.step ? "("+attributes.step as string + ") : " + attributes.label as string : attributes.label as string;
-          $("#details_body").append(detail);
-          $("#details_body").append(br);
-        }
+    if(attributes.label == "Write" || attributes.label == "Read" || attributes.label == "QueryEA" || attributes.label ==  "Key Creation" || attributes.label ==  "Delete Value" || attributes.label == "Set Value" || attributes.label ==  "Key Deletion"){
+      for (const {attributes} of graph.neighborEntries(e.node)) {
+        const detail = document.createElement('span');
+        detail.setAttribute('id','highlight-me');
+        const br = document.createElement('br');
+        detail.textContent = attributes.step ? "("+attributes.step as string + ") : " + attributes.label as string : attributes.label as string;
+        $("#details_body").append(detail);
+        $("#details_body").append(br);
       }
+    }
 
-      else if (attributes.details != undefined){
-        const details = attributes.details.split(",");
-        $.each(details, function(_index, item){
-          const detail = document.createElement('span');
-          detail.setAttribute('id','highlight-me');
-          const br = document.createElement('br');
-          detail.textContent = item as string;
-          $("#details_body").append(detail);
-          $("#details_body").append(br);
-        });
-      }
-      else{
-        $('#details_body').text(attributes.label);
-      }
-
-      $('#details_info').show();
-
-    });
-    
-    $("#steps_range").on("input", (e: any) => {
-      const step = e.target.value;
-      $("#step_count").text(step);
-      graph.nodes().map(function(item){
-        let attributes = graph.getNodeAttributes(item);
-        if (step < attributes.step){
-          graph.setNodeAttribute(item, "hidden", true);
-        }
-        else{
-          graph.setNodeAttribute(item, "hidden", false);
-        }
+    else if (attributes.details != undefined){
+      const details = attributes.details.split(",");
+      $.each(details, function(_index, item){
+        const detail = document.createElement('span');
+        detail.setAttribute('id','highlight-me');
+        const br = document.createElement('br');
+        detail.textContent = item as string;
+        $("#details_body").append(detail);
+        $("#details_body").append(br);
       });
-    });
+    }
+    else{
+      $('#details_body').text(attributes.label);
+    }
 
+    $('#details_info').show();
+  });
+  // Create the spring layout and start it
+  const layout = new FA2Layout(graph,{ settings: { gravity: 0.0001,}});
+  layout.start();
+  setTimeout(function(){
+    layout.stop();
+  }, 5000);
+}
+
+/* update_steps_display:
+Updating the graph and the step count on the UI
+*/
+function update_steps_display(step: number){
+  $("#step_count").text(step);
+    graph.nodes().map(function(item){
+    let attributes = graph.getNodeAttributes(item);
+    if (step < attributes.step){
+      graph.setNodeAttribute(item, "hidden", true);
+    }
+    else{
+      graph.setNodeAttribute(item, "hidden", false);
+    }
+  });
+}
+
+/* recompute_graph:
+When the user is triggering a filter, we rebuild the graph and update the step count
+*/
+function recompute_graph(json_graph: any){
+  graph = display_graph(json_graph);
+  $("#steps_range").attr("max", steps_count);
+  $("#steps_range").val(steps_count);
+  $("#step_count").text(steps_count);
 }
 
 /* load : 
@@ -409,38 +430,35 @@ async function load(path: string){
   invoke('get_procmon', {path: path}).then((result) => {
     const json_graph = JSON.parse(result as string);
     generate_select(json_graph.processes.processes);
-
     $('#loading_scan').addClass('d-none');
-    $('#process_picker').fadeIn(2000);
+    $('#process_picker').fadeIn(1500);
 
     $('#generate_btn').on("click", function(){
-      display_graph(json_graph);
-      $('#process_filter').fadeIn();
-      $('#filter_card').fadeIn();
+        recompute_graph(json_graph)
     });
 
     $('#RegCreateKey_filter').on("change", function(){
-        display_graph(json_graph);
+        recompute_graph(json_graph)
     });
    
     $('#RegDeleteKey_filter').on("change", function(){
-      display_graph(json_graph);
+        recompute_graph(json_graph)
     });
 
     $('#RegSetValue_filter').on("change", function(){
-      display_graph(json_graph);
+        recompute_graph(json_graph)
     });
 
     $('#RegDeleteValue_filter').on("change", function(){
-      display_graph(json_graph);
+        recompute_graph(json_graph)
     });
 
     $('#File_filter').on("change", function(){
-      display_graph(json_graph);
+        recompute_graph(json_graph)
     });
 
     $('#Network_filter').on("change", function(){
-      display_graph(json_graph);
+        recompute_graph(json_graph)
     });
 
 
@@ -555,20 +573,52 @@ function drag_cards(elmnt: HTMLElement | null) {
   }
 }
 
+/*
+-------------LISTENERS---------------
+*/
+
+
+$("#steps_range").on("input", (e: any) => {
+  const step = e.target.value;
+  update_steps_display(step);
+});
+
+$(document).on("keydown", function(e: any) { 
+  console.log("keydown !")
+  if (e.which === 39) { // 39 is the keyCode for the right arrow key
+    var step_c = $("#steps_range").val() as number;
+    if(step_c < steps_count){
+      step_c++;
+      $("#steps_range").val(step_c)
+      update_steps_display(step_c);
+    }
+  }
+  if (e.which === 37) { 
+    var step_c = $("#steps_range").val() as number;
+    if(step_c > 0){
+      step_c--;
+      $("#steps_range").val(step_c)
+      update_steps_display(step_c);
+    }
+  }      
+});
+
+
 $('#quit_btn').on("click", async function(){
   location.reload();
   routine();
+});
+
+$('#closebtn').on("click", async function(){
+  $('#details_info').hide();
 });
 
 document.addEventListener('DOMContentLoaded', () => {
   routine();
 });
 
-// Make the DIV element draggable:
-drag_cards(document.getElementById("process_info_card"));
-drag_cards(document.getElementById("filter_card"));
-drag_cards(document.getElementById("details_info"));
-
-$('#closebtn').on("click", async function(){
-  $('#details_info').hide();
-});
+// function print_info_message(message: string){
+//   $('#info-message').text(message);  
+//   const toast = new bootstrap.Toast('#info-toast'); 
+//   toast.show();
+// }  
